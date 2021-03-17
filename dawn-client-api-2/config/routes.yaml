@@ -1,0 +1,15 @@
+check_login:
+   path: /check/login
+   controller: App\Controller\UserController::checkLogin
+
+login:
+   path: /login
+   controller: App\Controller\UserController::login
+
+add_cookie:
+   path: /add/cookie
+   controller: App\Controller\UserController::addCookie
+
+logout:
+   path: /logout
+   controller: App\Controller\UserController::logout
