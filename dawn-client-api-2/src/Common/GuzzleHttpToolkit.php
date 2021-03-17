@@ -11,6 +11,8 @@ class GuzzleHttpToolkit
     protected static function checkClient()
     {
         if (null === self::$_client) {
+            // 由于本地配置的https会有证书认证问题，所以设置verify为false，即不强验证https
+
             $config = ['timeout' => 60, 'verify' => false];
             self::$_client = new Client($config);
 
