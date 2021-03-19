@@ -50,7 +50,7 @@ server {
 ```
 server {
   listen       80; # 只是接口，可以不配ssl
-  server_name  dawn.client-api-1.cn;
+  server_name  dawn.sso-client-api-1.cn;
   root /dawn-sso/dawn-client-api-1/public/; # 该地址换成本地自有地址
 
   if (!-e $request_filename) {
