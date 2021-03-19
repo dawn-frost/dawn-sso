@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends BaseController
 {
-    const USER_FILE = '/Users/huxiaoyan/Codes/dawn-sso/dawn-sso-api/var/user.txt'; // 该地址根据本地文件夹情况自定义
+    const USER_FILE = '/dawn-sso/dawn-sso-api/var/user.txt'; // 该地址根据本地文件夹情况自定义
 
     const DOMAIN_1 = 'https://dawn.sso-client-1.cn';  // 客户端1地址
     const DOMAIN_2 = 'https://dawn.sso-client-2.cn';  // 客户端2地址
