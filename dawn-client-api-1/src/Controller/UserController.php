@@ -4,39 +4,27 @@ namespace App\Controller;
 
 use App\Common\GuzzleHttpToolkit;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class UserController extends AbstractController
+class UserController extends BaseController
 {
     const DAWN_TOKEN = 'dawn-sso-login-token';
 
     public function checkLogin(Request $request)
     {
         $cookies = $request->cookies->all();
-
         if (!isset($cookies[self::DAWN_TOKEN])) {
-            return new JsonResponse(['success' => false,
-                'message' => '未登陆',
-                'code' => 0,
-                'data' => [], ]);
+            return $this->fail('未登录');
         }
 
         // 去sso认证
         $result = GuzzleHttpToolkit::post('https://dawn.sso-api.cn/check/login', ['token' => $cookies[self::DAWN_TOKEN]]);
         if ($result['success']) {
-            return new JsonResponse(['success' => true,
-                'message' => '已登陆',
-                'code' => 0,
-                'data' => $result['data'], ]);
+            return $this->success($result['data'], '已登录');
         }
 
-        return new JsonResponse(['success' => false,
-            'message' => '登陆认证未通过',
-            'code' => 0,
-            'data' => [], ]);
+        return $this->fail('登录认证未通过');
     }
 
     public function login(Request $request)
@@ -49,35 +37,23 @@ class UserController extends AbstractController
 
         $params = $request->request->all();
         if (empty($params['uname']) || empty($params['upwd'])) {
-            return new JsonResponse(['success' => false,
-                'message' => '参数错误',
-                'code' => 0,
-                'data' => [], ]);
+            return $this->fail('参数错误');
         }
 
-        // 去sso登陆
+        // 去sso登录
         $result = GuzzleHttpToolkit::post('https://dawn.sso-api.cn/login', $params);
         if (true === $result['success']) {
-            return new JsonResponse(['success' => true,
-                'message' => '登陆成功',
-                'code' => 1,
-                'data' => $result['data'], ]);
+            return $this->success($result['data'], '登录成功');
         }
 
-        return new JsonResponse(['success' => false,
-            'message' => '登陆失败',
-            'code' => 0,
-            'data' => [], ]);
+        return $this->fail('登录失败');
     }
 
     public function addCookie(Request $request)
     {
         $params = $request->query->all();
         if (empty($params['token'])) {
-            return new JsonResponse(['success' => false,
-                'message' => '参数错误',
-                'code' => 0,
-                'data' => [], ]);
+            return $this->fail('参数错误');
         }
 
         return $this->addLoginCookie($params['token']);
