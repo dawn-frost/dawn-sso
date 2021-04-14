@@ -3,17 +3,21 @@
 #    controller: App\Controller\DefaultController::index
 
 check_login:
-   path: /check/login
-   controller: App\Controller\UserController::checkLogin
+  path: /check/login
+  controller: App\Controller\UserController::checkLogin
 
 login:
-   path: /login
-   controller: App\Controller\UserController::login
-
-add_cookie:
-   path: /add/cookie
-   controller: App\Controller\UserController::addCookie
+  path: /login
+  controller: App\Controller\UserController::login
 
 logout:
-   path: /logout
-   controller: App\Controller\UserController::logout
+  path: /logout
+  controller: App\Controller\UserController::logout
+
+add_cookie:
+  path: /add/cookie
+  controller: App\Controller\UserController::addCookie
+
+clear_cookie:
+  path: /clear/cookie
+  controller: App\Controller\UserController::clearCookie

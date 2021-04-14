@@ -1,86 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
 
-  <body>
-    <div id="uinfo">
-      <div id="uinfo-name"></div>
-      <div id="uinfo-gender"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>客户端1</title>
+</head>
 
-      <button type="button" id="ulogout">退出登陆</button>
-    </div>
+<body>
+  <div>我是客户端1</div>
 
-    <form id="uform">
-      <input type="text" name="uname" value="" placeholder="用户名" />
-      <input type="text" name="upwd" value="" placeholder="密码" />
-      <button type="button" id="usubmit">登陆</button>
-    </form>
+  <div id="uinfo">
+    <div id="uinfo-name"></div>
+    <div id="uinfo-gender"></div>
 
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-      $(document).ready(function () {
-        $('#uinfo').hide()
-        $('#uform').hide()
-        // 页面一进来就验证是否已经登陆
+    <button type="button" id="ulogout">退出登陆</button>
+  </div>
+
+  <form id="uform">
+    <input type="text" name="uname" value="" placeholder="用户名" />
+    <input type="text" name="upwd" value="" placeholder="密码" />
+    <button type="button" id="usubmit">登陆</button>
+  </form>
+
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+    let clientUrl = 'https://dawn.sso-client-1.cn'
+
+    $(document).ready(function () {
+      $('#uinfo').hide()
+      $('#uform').hide()
+      // 页面一进来就验证是否已经登陆
+      $.ajax({
+        type: 'GET',
+        url: clientUrl + '/api/check/login',
+        data: {},
+        dataType: 'json',
+        success: function (data) {
+          if (data.success === false) {
+            $('#uform').show()
+          } else {
+            $('#uinfo-name').html(data.data.urealname)
+            $('#uinfo-gender').html(data.data.ugender)
+            $('#uinfo').show()
+          }
+        }
+      })
+
+      $('#usubmit').on('click', function () {
+        let vals = $('#uform').serialize()
         $.ajax({
-          type: 'GET',
-          url: 'https://dawn.sso-client-1.cn/api/check/login',
-          data: {},
+          type: 'POST',
+          url: clientUrl + '/api/login',
+          data: vals,
           dataType: 'json',
           success: function (data) {
-            if (data.success === false) {
-              $('#uform').show()
-            } else {
-              $('#uinfo-name').html(data.data.uname)
-              $('#uinfo-gender').html(data.data.ugender)
-              $('#uinfo').show()
-            }
-          }
-        })
-
-        $('#usubmit').on('click', function () {
-          let vals = $('#uform').serialize()
-          $.ajax({
-            type: 'POST',
-            url: 'https://dawn.sso-client-1.cn/api/login',
-            data: vals,
-            dataType: 'json',
-            success: function (data) {
-              if (data.success === true) {
-                $.each(data.data.domainList, function (index, url) {
-                  console.log(url)
-                  $.ajax({
-                    url: url + '/api/add/cookie?token=' + data.data.token,
-                    type: 'get',
-                    dataType: 'jsonp' //指定服务器返回的数据类型
-                  })
-                })
-
-                setTimeout(() => {
-                  window.location.reload()
-                }, 1000)
-              }
-            }
-          })
-        })
-
-        $('#ulogout').click(function (event) {
-          $.ajax({
-            url: 'https://dawn.sso-api.cn/logout',
-            type: 'get',
-            jsonp: 'callback', //传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(默认为:callback)
-            jsonpCallback: 'success_jsonpCallback', //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
-            dataType: 'jsonp', //指定服务器返回的数据类型
-            success: function (data) {
-              console.log(data)
-              $.each(data, function (index, url) {
+            if (data.success === true) {
+              $.each(data.data.domainList, function (index, url) {
+                console.log(url)
+                console.log(data.data.token)
                 $.ajax({
-                  url: url + '/api/logout',
+                  url: url + '/api/add/cookie?token=' + data.data.token,
                   type: 'get',
                   dataType: 'jsonp' //指定服务器返回的数据类型
                 })
@@ -89,14 +70,38 @@
               setTimeout(() => {
                 window.location.reload()
               }, 1000)
-            },
-            error: function (data) {
-              console.log(data)
-              // console.log(data.jqXHR + ' ' + data.status + ' ' + data.error)
             }
-          })
+          }
         })
       })
-    </script>
-  </body>
+
+      $('#ulogout').click(function (event) {
+        $.ajax({
+          type: 'POST',
+          url: clientUrl + '/api/logout',
+          data: {},
+          dataType: 'json',
+          success: function (data) {
+            if (data.success === true) {
+              $.each(data.data.domainList, function (index, url) {
+                console.log(url)
+                $.ajax({
+                  url: url + '/api/clear/cookie?token=' + data.data.token,
+                  type: 'get',
+                  dataType: 'jsonp' //指定服务器返回的数据类型
+                })
+              })
+
+              setTimeout(() => {
+                window.location.reload()
+              }, 1000)
+            }
+          }
+        })
+
+      })
+    })
+  </script>
+</body>
+
 </html>
